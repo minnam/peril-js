@@ -1,0 +1,82 @@
+{
+  "name": "peril-js",
+  "version": "0.0.0-development",
+  "description": "An audio synthesis and algorithmic composition library for Javascript.",
+  "main": "dist/index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "build": "npm-run-all --parallel build:*",
+    "build:main": "babel --copy-files --out-dir dist --ignore *.spec.js src",
+    "build:umd": "webpack --output-filename mark2.js",
+    "build:umd.min": "webpack --output-filename mark2.min.js -p",
+    "check-coverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
+    "commit": "git-cz",
+    "cover": "nyc npm t",
+    "dev": "webpack-dev-server --port 3000 --devtool eval --progress --colors --hot --content-base dist",
+    "prebuild": "rimraf dist",
+    "report-coverage": "cat ./coverage/lcov.info | codecov",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "tdd": "npm test -- --watch",
+    "test": "mocha ./src --require babel-register --require ./test/helpers.js --require ./test/dom.js --recursive",
+    "test:single": "nyc cover -x *.spec.js _mocha -- -R spec ./src",
+    "watch:test": "npm t -- -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/minnam/peril-js"
+  },
+  "keywords": [],
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "author": "Min Nam <hi@minnam.io> (http://minnam.io)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/minnam/peril-js/issues"
+  },
+  "homepage": "https://github.com/minnam/peril-js/",
+  "devDependencies": {
+    "babel-cli": "latest",
+    "babel-eslint": "latest",
+    "babel-loader": "latest",
+    "babel-preset-env": "latest",
+    "chai": "latest",
+    "codecov.io": "latest",
+    "commitizen": "latest",
+    "cz-conventional-changelog": "latest",
+    "enzyme": "latest",
+    "eslint": "latest",
+    "eslint-config-airbnb": "latest",
+    "eslint-plugin-import": "latest",
+    "eslint-plugin-jsx-a11y": "latest",
+    "eslint-plugin-react": "latest",
+    "husky": "latest",
+    "istanbul": "latest",
+    "jsdom": "latest",
+    "json-loader": "latest",
+    "mocha": "latest",
+    "npm-run-all": "latest",
+    "nyc": "latest",
+    "react-addons-test-utils": "latest",
+    "rimraf": "latest",
+    "semantic-release": "latest",
+    "sinon": "latest",
+    "webpack": "latest"
+  },
+  "czConfig": {
+    "path": "node_modules/cz-conventional-changelog"
+  },
+  "config": {
+    "ghooks": {
+      "pre-commit": "npm run cover && npm run check-coverage"
+    }
+  },
+  "babel": {
+    "presets": [
+      "env"
+    ]
+  }
+}

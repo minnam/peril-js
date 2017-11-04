@@ -1,0 +1,7 @@
+# Distribution
+dist
+node_modules
+coverage
+.nyc_output
+# OS Specific
+.DS_Store
