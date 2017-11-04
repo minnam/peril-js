@@ -76,8 +76,8 @@ Oscillator.prototype.setPhase = function( phase ){
 
 
 Oscillator.prototype.process = function(event){
-	var inputArray1 = event.inputBuffer.getChannelData(0);
-	var inputArray2 = event.inputBuffer.getChannelData(1);
+		var inputArray1 = event.inputBuffer.getChannelData(0);
+		var inputArray2 = event.inputBuffer.getChannelData(1);
     var outputArray = event.outputBuffer.getChannelData(0);
     var bufferSize = outputArray.length;
 

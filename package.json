@@ -21,7 +21,8 @@
     "tdd": "npm test -- --watch",
     "test": "mocha ./src --require babel-register --require ./test/helpers.js --require ./test/dom.js --recursive",
     "test:single": "nyc cover -x *.spec.js _mocha -- -R spec ./src",
-    "watch:test": "npm t -- -w"
+    "watch:test": "npm t -- -w",
+    "start:legacy": "http-server ./src/legacy/"
   },
   "repository": {
     "type": "git",
@@ -54,6 +55,7 @@
     "eslint-plugin-jsx-a11y": "latest",
     "eslint-plugin-react": "latest",
     "express": "4.16.2",
+    "http-server": "0.10.0",
     "husky": "latest",
     "istanbul": "latest",
     "jsdom": "latest",

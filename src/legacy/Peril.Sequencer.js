@@ -1,5 +1,5 @@
 var Clock = function(rate, size, sequences){
-	this.rate = rate;	
+	this.rate = rate;
 	this.sequences = sequences;
 	this.size = size;
 	this.index = 0;
@@ -12,7 +12,11 @@ Clock.prototype.setRate = function(rate){
 		this.stop();
 		this.start();
 	}
-	
+
+}
+
+Clock.prototype.addSequencer = function (sequencer) {
+	this.sequences.push(sequencer);
 }
 
 Clock.prototype.start = function(){
@@ -25,8 +29,8 @@ Clock.prototype.trigger = function(){
 	}
 	this.index = (this.index + 1) % this.size;
 	console.log(this.index)
-	
-}	
+
+}
 
 Clock.prototype.stop = function(){
 	clearInterval(this.interval);
@@ -37,7 +41,7 @@ Clock.prototype.stop = function(){
 Clock.prototype.reset = function(index){
 	if(index == null)
 		this.index = 0;
-	else 
+	else
 		this.index = index;
 }
 
@@ -79,26 +83,26 @@ Sequencer.prototype.setSequence = function(index){
 	this.playingSequence = this.sequence.sequences[index];
 }
 
-Sequencer.prototype.trigger = function(currentSeq){	
-	
+Sequencer.prototype.trigger = function(currentSeq){
+
 	if(this.playingSequence[this.currentSeq] != 0)
 	{
-		window[this.target][this.callback](this.playingSequence[this.currentSeq]);					
+		window[this.target][this.callback](this.playingSequence[this.currentSeq]);
 	}
-	this.sequenceCallback(currentSeq);	
+	this.sequenceCallback(currentSeq);
 }
 
 Sequencer.prototype.increment = function(currentSeq){
-		
-	this.currentSeq = currentSeq % this.size;		
+
+	this.currentSeq = currentSeq % this.size;
 }
 
-Sequencer.prototype.decrement = function(){	
+Sequencer.prototype.decrement = function(){
 	if( this.currentSeq > 0){
 		this.currentSeq--
 	}else{
 		this.currentSeq = this.size - 1;
-	}	
+	}
 }
 
 

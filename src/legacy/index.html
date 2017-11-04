@@ -77,18 +77,18 @@ var delay2 = new Delay((0.2 * 0.8)/2, 0.4);
 delay2.setOutput(verb1.outputDry)
 
 
-var kick1 = new Simpler("/sound/808/BD1.wav",1, 1, false);
+var kick1 = new Simpler("/sound/909/BD1.wav",1, 1, false);
 kick1.setOutput(verb1.reverb, verb1.outputDry, delay1.delay);
 
 
-var kick2 = new Simpler("/sound/808/BD2.wav",1,1, false);
+var kick2 = new Simpler("/sound/909/BD2.wav",1,1, false);
 
 kick2.setOutput(verb1.reverb, verb1.outputDry)
 
-var snare1 = new Simpler("/sound/909/SD2.wav",2,1, false);
+var snare1 = new Simpler("/sound/909/SD3.wav",2,1, false);
 snare1.setOutput(verb1.reverb, verb1.outputDry, delay2.delay);
 
-var hihat1 = new Simpler("/sound/909/CLHIHAT4.wav",2,4, false);
+var hihat1 = new Simpler("/sound/909/CLHIHAT5.wav",2,4, false);
 hihat1.setOutput(verb1.reverb, verb1.outputDry)
 
 var hihat2 = new Simpler("/sound/909/OPHIHAT5.wav",2,3, false);
@@ -97,7 +97,7 @@ hihat2.setOutput(verb1.reverb, verb1.outputDry)
 var crash1 = new Simpler("/sound/909/CRASH5.wav",2,1, false);
 crash1.setOutput(verb1.reverb, verb1.outputDry)
 
-var rim1 = new Simpler("/sound/909/RIM.wav",1,0.5, false);
+var rim1 = new Simpler("/sound/909/SD9.wav",1,0.5, false);
 rim1.setOutput(verb1.reverb, verb1.outputDry)
 
 var tom1 = new Simpler("/sound/909/HITOM1.wav",2,1, false);
@@ -106,13 +106,13 @@ tom1.setOutput(verb1.reverb, verb1.outputDry)
 var tom2 = new Simpler("/sound/909/LOTOM4.wav",2,1,false);
 tom2.setOutput(verb1.reverb, verb1.outputDry)
 
-var osc1 = new Oscillator(0, 0, 0.3, 0, 0);
+var osc1 = new Oscillator(0, 0, 0.2, 0, 0);
 osc1.setOutput(verb1.reverb, verb1.outputDry);
 
 var osc2 = new Oscillator(0, 0, 0.01, 0, 0);
 osc2.setOutput(verb1.reverb, verb1.outputDry);
 
-var osc3 = new Oscillator(0, 440, 0, 0, 0);
+var osc3 = new Oscillator(0, 440, 0.01, 0, 0);
 osc3.setOutput(verb1.reverb, verb1.outputDry,delay1.delay);
 
 var ar1 = new AR(osc3.output.gain, 0.5, 1);
@@ -138,7 +138,7 @@ var seq5 = new Sequencer(0, sequence5, "osc2",   "setFrequency", 0)
 var seq6 = new Sequencer(0, sequence6, "osc3",   "setFrequency", 0)
 var seq7 = new Sequencer(0, sequence7, "ar1",    "trigger", 0)
 
-var clock1 = new Clock( 80, 64, [seq1, seq2, seq3,seq6,seq7]);
+var clock1 = new Clock( 80, 64, [seq4, seq5, seq6, seq7]);
 
 
 </script>
