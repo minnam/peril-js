@@ -1,1 +1,1 @@
-# Peril JS
+# Peril
