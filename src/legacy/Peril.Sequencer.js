@@ -1,4 +1,5 @@
 var Clock = function(rate, size, sequences){
+	alert();
 	this.rate = rate;
 	this.sequences = sequences;
 	this.size = size;
@@ -15,7 +16,7 @@ Clock.prototype.setRate = function(rate){
 
 }
 
-Clock.prototype.addSequencer = function (sequencer) {
+Clock.prototype.add = function (sequencer) {
 	this.sequences.push(sequencer);
 }
 
@@ -23,7 +24,7 @@ Clock.prototype.start = function(){
 	this.interval = setInterval( this.trigger.bind(this), this.rate ) ;
 }
 
-Clock.prototype.trigger = function(){
+Clock.prototype.trigger = function(){	
 	for(i = 0; i < this.sequences.length; i++){
 		this.sequences[i].trigger(this.index);
 	}
