@@ -28,8 +28,6 @@ Clock.prototype.trigger = function(){
 		this.sequences[i].trigger(this.index);
 	}
 	this.index = (this.index + 1) % this.size;
-	console.log(this.index)
-
 }
 
 Clock.prototype.stop = function(){

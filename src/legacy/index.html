@@ -106,7 +106,7 @@ tom1.setOutput(verb1.reverb, verb1.outputDry)
 var tom2 = new Simpler("/sound/909/LOTOM4.wav",2,1,false);
 tom2.setOutput(verb1.reverb, verb1.outputDry)
 
-var osc1 = new Oscillator(0, 0, 0.2, 0, 0);
+var osc1 = new Oscillator(0, 0, 0.05, 0, 0);
 osc1.setOutput(verb1.reverb, verb1.outputDry);
 
 var osc2 = new Oscillator(0, 0, 0.01, 0, 0);
@@ -115,7 +115,7 @@ osc2.setOutput(verb1.reverb, verb1.outputDry);
 var osc3 = new Oscillator(0, 440, 0.01, 0, 0);
 osc3.setOutput(verb1.reverb, verb1.outputDry,delay1.delay);
 
-var ar1 = new AR(osc3.output.gain, 0.5, 1);
+var ar1 = new AR(osc3.output.gain, 0.3, 1);
 
 var osc4 = new Oscillator(0, 0, 0.08, 0, 0);
 osc4.setOutput(verb1.outputDry, delay2.delay);
