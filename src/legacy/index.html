@@ -1,0 +1,146 @@
+<html>
+<head>
+	<style>
+	#oscilloscope {
+        width: 1000px;
+        height: 400px;
+    }
+    button{
+    	width:100px;
+    	height:100px;
+    	margin: 2px;
+    	background: white;
+    	border: grey 1px solid;
+    }
+    </style>
+	<title></title>
+</head>
+<body>
+	<div style = "margin: 10% 20%">
+		<button onclick = 'kick1.play()'></button>
+		<button onclick = 'kick2.play()'></button>
+		<button onclick = 'snare1.play()'></button><br>
+		<button onclick = 'hihat1.play()'></button>
+		<button onclick = 'hihat2.play()'></button>
+		<button onclick = 'crash1.play()'></button><br>
+		<button onclick = 'rim1.play()'></button>
+		<button onclick = 'tom1.play()'></button>
+		<button onclick = 'tom2.play()'></button>
+	</div>
+	<div id = "seq1">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+		<input type="checkbox">
+	</div>
+
+<script src="Peril.Core.js"></script>
+<script src="Peril.Amplitude.js"></script>
+<script src="Peril.Constant.js"></script>
+<script src="Peril.Oscillator.js"></script>
+<script src="Peril.Noise.js"></script>
+<script src="Peril.Filter.js"></script>
+<script src="Peril.Envelope.js"></script>
+<script src="Peril.Util.js"></script>
+<script src="Peril.Scope.js"></script>
+<script src="Peril.Sequencer.js"></script>
+<script src="Peril.Sample.js"></script>
+<script src="Peril.Convolver.js"></script>
+<script src="Peril.Patch.js"></script>
+
+<script>
+
+var scope1 = new Scope();
+scope1.connect(AC.destination);
+
+var verb1 = new Reverb("/ir/ir2.wav", 1,0.5);
+verb1.init();
+verb1.outputDry.connect(scope1)
+verb1.outputWet.connect(scope1)
+
+var delay1 = new Delay(0.2 * 0.8, 0.4);
+delay1.setOutput(verb1.outputDry);
+
+var delay2 = new Delay((0.2 * 0.8)/2, 0.4);
+delay2.setOutput(verb1.outputDry)
+
+
+var kick1 = new Simpler("/sound/808/BD1.wav",1, 1, false);
+kick1.setOutput(verb1.reverb, verb1.outputDry, delay1.delay);
+
+
+var kick2 = new Simpler("/sound/808/BD2.wav",1,1, false);
+
+kick2.setOutput(verb1.reverb, verb1.outputDry)
+
+var snare1 = new Simpler("/sound/909/SD2.wav",2,1, false);
+snare1.setOutput(verb1.reverb, verb1.outputDry, delay2.delay);
+
+var hihat1 = new Simpler("/sound/909/CLHIHAT4.wav",2,4, false);
+hihat1.setOutput(verb1.reverb, verb1.outputDry)
+
+var hihat2 = new Simpler("/sound/909/OPHIHAT5.wav",2,3, false);
+hihat2.setOutput(verb1.reverb, verb1.outputDry)
+
+var crash1 = new Simpler("/sound/909/CRASH5.wav",2,1, false);
+crash1.setOutput(verb1.reverb, verb1.outputDry)
+
+var rim1 = new Simpler("/sound/909/RIM.wav",1,0.5, false);
+rim1.setOutput(verb1.reverb, verb1.outputDry)
+
+var tom1 = new Simpler("/sound/909/HITOM1.wav",2,1, false);
+tom1.setOutput(verb1.reverb, verb1.outputDry)
+
+var tom2 = new Simpler("/sound/909/LOTOM4.wav",2,1,false);
+tom2.setOutput(verb1.reverb, verb1.outputDry)
+
+var osc1 = new Oscillator(0, 0, 0.3, 0, 0);
+osc1.setOutput(verb1.reverb, verb1.outputDry);
+
+var osc2 = new Oscillator(0, 0, 0.01, 0, 0);
+osc2.setOutput(verb1.reverb, verb1.outputDry);
+
+var osc3 = new Oscillator(0, 440, 0, 0, 0);
+osc3.setOutput(verb1.reverb, verb1.outputDry,delay1.delay);
+
+var ar1 = new AR(osc3.output.gain, 0.5, 1);
+
+var osc4 = new Oscillator(0, 0, 0.08, 0, 0);
+osc4.setOutput(verb1.outputDry, delay2.delay);
+
+var sequence1 = new Sequence([1,0,0,0,0,0,1,0, 0,0,0,0,0,0,1,0, 1,0,0,0,0,0,1,0, 0,0,0,0,0,0,0,0, 0,0,1,0,1,0,1,0, 0,0,0,0,0,0,1,0, 1,0,0,0,0,0,1,0, 0,0,1,0,0,0,0,0],
+							 [1,1,1,0,0,0,1,0, 0,0,0,0,0,0,1,0, 1,0,0,0,0,0,1,0, 0,0,0,0,0,0,0,0, 0,0,1,0,1,0,1,0, 0,0,0,0,0,0,1,0, 1,0,0,0,0,0,1,0, 0,0,1,0,0,0,0,0]);
+
+var sequence2 = new Sequence([0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,0,0,0,0,1,0]);
+var sequence3 = new Sequence([0,0,0,0,0,0,0,0, 0,0,0,0,1,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,1,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,1,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,1,0,1,0]);
+var sequence4 = new Sequence([240,0,0,0,0,0,0,0, 300,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 440,0,0,0,0,0,0,0, 440,0,0,0,0,0,0,0, 440,0,0,0,0,0,0,0, 300,440,0,0,0,0,300,480]);
+var sequence5 = new Sequence([240,0,0,0,0,0,0,0, 300,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 220,0,0,0,0,0,0,0, 220,0,0,0,0,0,0,0, 220,0,0,0,0,0,0,0, 300,220,0,0,0,0,300,240]);
+var sequence6 = new Sequence([220,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 150	,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 500,490,480,470,460,0,0,880]);
+var sequence7 = new Sequence([0.5,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0.5,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0.4,0,0,0,0,0,0,0.2]);
+
+var seq1 = new Sequencer(0, sequence1, "kick1",  "play", 0)
+var seq2 = new Sequencer(0, sequence2, "snare1", "play", 0)
+var seq3 = new Sequencer(0, sequence3, "rim1",   "play", 0)
+var seq4 = new Sequencer(0, sequence4, "osc1",   "setFrequency", 0)
+var seq5 = new Sequencer(0, sequence5, "osc2",   "setFrequency", 0)
+var seq6 = new Sequencer(0, sequence6, "osc3",   "setFrequency", 0)
+var seq7 = new Sequencer(0, sequence7, "ar1",    "trigger", 0)
+
+var clock1 = new Clock( 80, 64, [seq1, seq2, seq3,seq6,seq7]);
+
+
+</script>
+</body>
+</html>
