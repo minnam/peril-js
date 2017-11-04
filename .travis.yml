@@ -5,15 +5,15 @@ cache:
 notifications:
   email: false
 node_js:
-  - '8'  
+  - '8'
 before_script:
   - npm prune
 script:
   - npm run cover
-  - npm run check-coverage
+#  - npm run check-coverage
   - npm run build
 after_success:
-  - npm run report-coverage
+#  - npm run report-coverage
   - npm run semantic-release
 branches:
   only:
