@@ -1,0 +1,34 @@
+<html>
+<head></head>
+<body>
+  <script src = './peril.js'></script>
+  <script src = './scope.js'></script>
+  <script>
+
+    var scope = new Scope();
+    scope.connect(peril.CONTEXT.destination);
+
+    var osc3 = new peril.Oscillator({
+      type: 2,
+      freq: 20,
+      gain: 0.1,
+    })
+    var osc2 = new peril.Oscillator({
+      type: 0,
+      freq: 10,
+      gain: 0.01,
+      mod: osc3.output
+    })
+    var osc = new peril.Oscillator({
+      type: 5,
+      freq: 300,
+      gain: 0.5,
+      mod: osc2.output
+    })
+
+
+    osc.setOutput(scope);
+
+  </script>
+</body>
+</html>

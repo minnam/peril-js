@@ -9,19 +9,20 @@
   "scripts": {
     "build": "npm-run-all --parallel build:*",
     "build:main": "babel --copy-files --out-dir dist --ignore *.spec.js src",
-    "build:umd": "webpack --output-filename peril.js",
+    "build:umd": "webpack --output-filename ../examples/peril.js ",
+    "build:example": "webpack --output-filename peril.js",
     "build:umd.min": "webpack --output-filename peril.min.js -p",
     "check-coverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
     "commit": "git-cz",
     "cover": "nyc npm t",
-    "dev": "webpack-dev-server --port 3000 --devtool eval --progress --colors --hot --content-base dist",
     "prebuild": "rimraf dist",
     "report-coverage": "cat ./coverage/lcov.info | codecov",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "tdd": "npm test -- --watch",
-    "test": "mocha ./src --require babel-register --require ./test/helpers.js --require ./test/dom.js --recursive",
+    "test": "jest --coverage",
     "test:single": "nyc cover -x *.spec.js _mocha -- -R spec ./src",
     "watch:test": "npm t -- -w",
+    "start:example": "http-server ./examples/",
     "start:legacy": "http-server ./src/legacy/"
   },
   "repository": {
@@ -50,14 +51,19 @@
     "cz-conventional-changelog": "latest",
     "enzyme": "latest",
     "eslint": "latest",
-    "eslint-config-airbnb": "latest",
-    "eslint-plugin-import": "latest",
+    "eslint-config-standard": "10.2.1",
+    "eslint-plugin-import": "2.8.0",
     "eslint-plugin-jsx-a11y": "latest",
+    "eslint-plugin-node": "5.2.1",
+    "eslint-plugin-promise": "3.6.0",
     "eslint-plugin-react": "latest",
+    "eslint-plugin-standard": "3.0.1",
     "express": "4.16.2",
     "http-server": "0.10.0",
     "husky": "latest",
     "istanbul": "latest",
+    "jest": "21.2.1",
+    "jest-cli": "21.2.1",
     "jsdom": "latest",
     "json-loader": "latest",
     "mocha": "latest",
@@ -85,5 +91,15 @@
     "presets": [
       "env"
     ]
+  },
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "branches": 0,
+        "functions": 0,
+        "lines": 0,
+        "statements": 0
+      }
+    }
   }
 }
