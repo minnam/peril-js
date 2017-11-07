@@ -1,4 +1,5 @@
 import Oscillator from './'
+import ERRORS from '../errors.js'
 import {TWOPI, SAMPLERATE} from '../constant'
 
 test('contains these variables', () => {
@@ -44,6 +45,50 @@ test('get triangle wave tick', () => {
 
 test('get phase increment', () => {
   const osc = new Oscillator()
-
   expect(osc.getPhaseIncrement(0)).toBe((2 * Math.PI * (440)) / SAMPLERATE)
+  expect(osc.getPhaseIncrement(5)).toBe((2 * Math.PI * (445)) / SAMPLERATE)
+})
+
+test('set type', () => {
+  const osc = new Oscillator()
+  osc.setType(0)
+  expect(osc.type).toBe(0)
+  osc.setType(1)
+  expect(osc.type).toBe(1)
+  osc.setType(2)
+  expect(osc.type).toBe(2)
+  osc.setType(3)
+  expect(osc.type).toBe(3)
+  osc.setType(4)
+  expect(osc.type).toBe(4)
+  osc.setType()
+  expect(osc.type).toBe(0)
+})
+
+test('set frequency', () => {
+  const osc = new Oscillator()
+  osc.setFreq(20)
+  expect(osc.freq).toBe(20)
+  expect(() => {
+    osc.setFreq(0)
+  }).toThrowError(ERRORS.invalidFreq)
+})
+
+test('set gain', () => {
+  const osc = new Oscillator()
+  osc.setGain(1)
+  expect(osc.gain).toBe(1)
+  osc.setGain()
+  expect(osc.gain).toBe(0)
+  expect(() => {
+    osc.setGain(-1)
+  }).toThrowError(ERRORS.invalidGain)
+})
+
+test('set phase', () => {
+  const osc = new Oscillator()
+  osc.setPhase(1)
+  expect(osc.phase).toBe(1)
+  osc.reset()
+  expect(osc.phase).toBe(0)
 })

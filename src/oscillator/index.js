@@ -1,31 +1,45 @@
+import _ from 'lodash'
 import Core from '../core'
+import ERRORS from '../errors.js'
 import {CONTEXT, PI, TWOPI, SAMPLERATE} from '../constant'
 
+/**
+ * Oscillator
+ * @param {Object={}} props Parameter object for Oscillator class
+ * @param {number=0} type Index of waveform
+ * @param {freq=440} freq Frequency in Hertz
+ * @param {gain=0} gain Level of output
+ * @param {phase=0} phase Phase in radian
+ * @param {offset=0} offset Offset to frequency in Hertz
+ */
 class Oscillator extends Core {
   constructor (props = {}) {
     super(props)
 
-    this.type = props.type || 0
-    this.freq = props.freq || 440
-    this.gain = props.gain || 0
-    this.phase = props.phase || 0
+    this.setType(props.type)
+    this.setFreq(props.freq)
+    this.setGain(props.gain)
+    this.setPhase(props.phase)
+    this.offset = props.offset || 0
+    this.sync = props.sync
     this.mod = props.mod
 
-    this.setType(this.type)
+    if (this.sync) {
+      this.sync.synced = true
+    }
 
+    /* istanbul ignore next */
     if (CONTEXT) {
       this.processor = CONTEXT.createScriptProcessor(1024)
       this.processor.onaudioprocess = this.process.bind(this)
 
-      this.input = CONTEXT.createChannelMerger(2)
+      this.input = CONTEXT.createChannelMerger(10)
 
-      if (this.mod) {
-        this.mod.connect(this.input)
+      if (this.mod && this.mod.output) {
+        this.mod.processor.connect(this.input)
       }
 
       this.input.connect(this.processor)
-
-
       this.output = CONTEXT.createGain()
       this.output.gain.value = this.gain
 
@@ -33,15 +47,14 @@ class Oscillator extends Core {
     }
   }
 
-  /* istanbul ignore next */
   setType (type) {
-    this.type = type
+    this.type = type || 0
     switch (this.type) {
       case 0:
         this.callback = this.getSineTick
         break
       case 1:
-        this.callback = this.getSquareTick
+        this.callback = this.getTriTick
         break
       case 2:
         this.callback = this.getSawtoothDTick
@@ -51,9 +64,40 @@ class Oscillator extends Core {
         break
       case 4:
       default:
-        this.callback = this.getTriTick
+        this.callback = this.getSquareTick
         break
     }
+  }
+
+  setFreq (freq) {
+    if (freq <= 0) {
+      this.freq = 440
+      throw new Error(ERRORS.invalidFreq)
+    } else {
+      this.freq = freq || 440
+    }
+  }
+
+  setGain (gain) {
+    if (gain < 0) {
+      this.gain = 0
+      throw new Error(ERRORS.invalidGain)
+    } else {
+      this.gain = gain || 0
+    }
+  }
+
+  setPhase (phase) {
+    this.phase = phase || 0
+  }
+
+  /**
+   * reset - reset phase
+   */
+  reset () {
+    this.phase = 0
+    this.lastInput = 0
+    this.freq = this.props.freq
   }
 
   /* istanbul ignore next */
@@ -65,10 +109,17 @@ class Oscillator extends Core {
 
     for (let i = 0; i < bufferSize; i++) {
       outputArray[i] = this.callback(0)
-      this.freq = (inputArray1[i] ? inputArray1[i] + this.freq : this.freq)
-      this.phase += (this.getPhaseIncrement(this.lastInput))
+
+      this.phase += (this.getPhaseIncrement((inputArray1[i] ? (inputArray1[i] * this.mod.gain) + this.freq : 0) + this.offset))
       this.lastInput = inputArray2[i]
-      this.wrap()
+
+      if (this.sync && this.phase > TWOPI) {
+        this.sync.reset()
+      }
+
+      if (!this.synced) {
+        this.wrap()
+      }
     }
   }
 
@@ -108,7 +159,7 @@ class Oscillator extends Core {
   wrap () {
     /* istanbul ignore next */
     if (this.phase > TWOPI) {
-      this.phase -= TWOPI
+      this.reset()
     }
   }
 }
