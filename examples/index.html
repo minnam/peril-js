@@ -5,29 +5,51 @@
   <script src = './scope.js'></script>
   <script>
 
-    var scope = new Scope();
-    scope.connect(peril.CONTEXT.destination);
+  var scope = new Scope();
+  scope.connect(peril.CONTEXT.destination);
 
-    var osc3 = new peril.Oscillator({
-      type: 2,
-      freq: 20,
-      gain: 0.1,
-    })
-    var osc2 = new peril.Oscillator({
-      type: 0,
-      freq: 10,
-      gain: 0.01,
-      mod: osc3.output
-    })
-    var osc = new peril.Oscillator({
-      type: 5,
-      freq: 300,
-      gain: 0.5,
-      mod: osc2.output
-    })
+  peril.CONTEXT.suspend()
+
+  var osc = new peril.Oscillator({
+    type: 2,
+    freq: 1,
+    gain: 200,
+  })
 
 
-    osc.setOutput(scope);
+  var osc3 = new peril.Oscillator({
+    type: 0,
+    freq: 1,
+    gain: 0,
+  })
+
+  var osc4 = new peril.Oscillator({
+    type: 0,
+    freq: 440,
+    gain: 1,
+  })
+
+  var osc2 = new peril.Oscillator({
+    type: 0,
+    freq: 440,
+    gain: 1,
+    sync: osc4
+  })
+
+
+  var ch1 = new peril.Channel();
+  var ch2 = new peril.Channel();
+
+
+  osc2.setOutput(ch1.input)
+  // osc4.setOutput(ch2.input)
+  ch1.input.pan.value = 0
+  ch2.input.pan.value = 1
+  ch1.setOutput(peril.CONTEXT.destination)
+  // ch2.setOutput(peril.CONTEXT.destination)
+
+  // osc2.setOutput(scope);
+  osc4.setOutput(scope);
 
   </script>
 </body>
