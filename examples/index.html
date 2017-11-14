@@ -1,6 +1,9 @@
 <html>
 <head></head>
 <body>
+  <button style = "position:fixed; right: 0;" id = "suspend">Suspend</button>
+  <input style = "position:fixed; right: 0; top: 100px" type="range" min="1" max="2000" value="50" class="slider" id="myRange">
+  <input style = "position:fixed; right: 0; top: 120px" type="range" min="1" max="2000" value="50" class="slider" id="myRange2">
   <script src = './peril.js'></script>
   <script src = './scope.js'></script>
   <script>
@@ -10,46 +13,78 @@
 
   peril.CONTEXT.suspend()
 
+  flag = 0
+
+  function suspend(){
+
+    if (flag) {
+      flag=!flag
+      peril.CONTEXT.suspend()
+    } else {
+      flag=!flag
+      peril.CONTEXT.resume()
+    }
+
+  }
+
+  document.getElementById('suspend').addEventListener('click', suspend)
+
+  document.getElementById('myRange').addEventListener('change', (event) => {
+    impulse.setFreq(parseInt(event.target.value));
+  })
+
+  document.getElementById('myRange2').addEventListener('change', (event) => {
+    osc4.setFreq(parseInt(event.target.value));
+  })
+
   var osc = new peril.Oscillator({
-    type: 2,
+    type: 1,
     freq: 1,
-    gain: 200,
+    gain: 40,
   })
 
 
-  var osc3 = new peril.Oscillator({
-    type: 0,
-    freq: 1,
-    gain: 0,
+  var impulse = new peril.Impulse({
+    freq: 10,
+    mod: osc
   })
+
 
   var osc4 = new peril.Oscillator({
-    type: 0,
-    freq: 440,
+    type: 3,
+    freq: 694,
     gain: 1,
+    // retrig: impulse
   })
 
   var osc2 = new peril.Oscillator({
-    type: 0,
-    freq: 440,
-    gain: 1,
-    sync: osc4
+    type: 4,
+    freq: 3,
+    gain: 0,
   })
 
+
+  // var osc3 = new peril.Oscillator({
+  //   type: 0,
+  //   freq: 300,
+  //   gain: 0.1,
+  //   mod: osc4
+  // })
 
   var ch1 = new peril.Channel();
   var ch2 = new peril.Channel();
 
 
-  osc2.setOutput(ch1.input)
-  // osc4.setOutput(ch2.input)
-  ch1.input.pan.value = 0
-  ch2.input.pan.value = 1
-  ch1.setOutput(peril.CONTEXT.destination)
-  // ch2.setOutput(peril.CONTEXT.destination)
+  // osc2.setOutput(ch1.input)
 
-  // osc2.setOutput(scope);
-  osc4.setOutput(scope);
+  osc4.setOutput(scope)
+  ch1.input.pan.value = 0
+  // ch2.input.pan.value = 1
+  ch1.setOutput(scope)
+  // // ch2.setOutput(peril.CONTEXT.destination)
+  //
+  // osc3.setOutput(scope);
+  // osc4.setOutput(scope);
 
   </script>
 </body>

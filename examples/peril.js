@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -131,257 +131,6 @@ exports.default = Core;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _constant = __webpack_require__(0);
-
-var _oscillator = __webpack_require__(3);
-
-var _oscillator2 = _interopRequireDefault(_oscillator);
-
-var _channel = __webpack_require__(8);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-module.exports = {
-  CONTEXT: _constant.CONTEXT,
-  Oscillator: _oscillator2.default,
-  Channel: _channel.Channel
-};
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _lodash = __webpack_require__(4);
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-var _core = __webpack_require__(1);
-
-var _core2 = _interopRequireDefault(_core);
-
-var _errors = __webpack_require__(7);
-
-var _errors2 = _interopRequireDefault(_errors);
-
-var _constant = __webpack_require__(0);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * Oscillator
- * @param {Object={}} props Parameter object for Oscillator class
- * @param {number=0} type Index of waveform
- * @param {freq=440} freq Frequency in Hertz
- * @param {gain=0} gain Level of output
- * @param {phase=0} phase Phase in radian
- * @param {offset=0} offset Offset to frequency in Hertz
- */
-var Oscillator = function (_Core) {
-  _inherits(Oscillator, _Core);
-
-  function Oscillator() {
-    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, Oscillator);
-
-    var _this = _possibleConstructorReturn(this, (Oscillator.__proto__ || Object.getPrototypeOf(Oscillator)).call(this, props));
-
-    _this.setType(props.type);
-    _this.setFreq(props.freq);
-    _this.setGain(props.gain);
-    _this.setPhase(props.phase);
-    _this.offset = props.offset || 0;
-    _this.sync = props.sync;
-    _this.mod = props.mod;
-
-    if (_this.sync) {
-      _this.sync.synced = true;
-    }
-
-    /* istanbul ignore next */
-    if (_constant.CONTEXT) {
-      _this.processor = _constant.CONTEXT.createScriptProcessor(1024);
-      _this.processor.onaudioprocess = _this.process.bind(_this);
-
-      _this.input = _constant.CONTEXT.createChannelMerger(10);
-
-      if (_this.mod && _this.mod.output) {
-        _this.mod.processor.connect(_this.input);
-      }
-
-      _this.input.connect(_this.processor);
-      _this.output = _constant.CONTEXT.createGain();
-      _this.output.gain.value = _this.gain;
-
-      _this.processor.connect(_this.output);
-    }
-    return _this;
-  }
-
-  _createClass(Oscillator, [{
-    key: 'setType',
-    value: function setType(type) {
-      this.type = type || 0;
-      switch (this.type) {
-        case 0:
-          this.callback = this.getSineTick;
-          break;
-        case 1:
-          this.callback = this.getTriTick;
-          break;
-        case 2:
-          this.callback = this.getSawtoothDTick;
-          break;
-        case 3:
-          this.callback = this.getSawtoothUTick;
-          break;
-        case 4:
-        default:
-          this.callback = this.getSquareTick;
-          break;
-      }
-    }
-  }, {
-    key: 'setFreq',
-    value: function setFreq(freq) {
-      if (freq <= 0) {
-        this.freq = 440;
-        throw new Error(_errors2.default.invalidFreq);
-      } else {
-        this.freq = freq || 440;
-      }
-    }
-  }, {
-    key: 'setGain',
-    value: function setGain(gain) {
-      if (gain < 0) {
-        this.gain = 0;
-        throw new Error(_errors2.default.invalidGain);
-      } else {
-        this.gain = gain || 0;
-      }
-    }
-  }, {
-    key: 'setPhase',
-    value: function setPhase(phase) {
-      this.phase = phase || 0;
-    }
-
-    /**
-     * reset - reset phase
-     */
-
-  }, {
-    key: 'reset',
-    value: function reset() {
-      this.phase = 0;
-      this.lastInput = 0;
-      this.freq = this.props.freq;
-    }
-
-    /* istanbul ignore next */
-
-  }, {
-    key: 'process',
-    value: function process(event) {
-      var inputArray1 = event.inputBuffer.getChannelData(0);
-      var inputArray2 = event.inputBuffer.getChannelData(1);
-      var outputArray = event.outputBuffer.getChannelData(0);
-      var bufferSize = outputArray.length;
-
-      for (var i = 0; i < bufferSize; i++) {
-        outputArray[i] = this.callback(0);
-
-        this.phase += this.getPhaseIncrement((inputArray1[i] ? inputArray1[i] * this.mod.gain + this.freq : 0) + this.offset);
-        this.lastInput = inputArray2[i];
-
-        if (this.sync && this.phase > _constant.TWOPI) {
-          this.sync.reset();
-        }
-
-        if (!this.synced) {
-          this.wrap();
-        }
-      }
-    }
-  }, {
-    key: 'getSineTick',
-    value: function getSineTick(phase) {
-      return Math.sin(this.phase + phase);
-    }
-  }, {
-    key: 'getSquareTick',
-    value: function getSquareTick(phase) {
-      if (this.phase + phase <= _constant.PI) {
-        return 1;
-      }
-      return -1;
-    }
-  }, {
-    key: 'getSawtoothUTick',
-    value: function getSawtoothUTick(phase) {
-      return 2 * ((this.phase + phase) * (1.0 / _constant.TWOPI)) - 1.0;
-    }
-  }, {
-    key: 'getSawtoothDTick',
-    value: function getSawtoothDTick(phase) {
-      return 1.0 - 2 * ((this.phase + phase) * (1.0 / _constant.TWOPI));
-    }
-  }, {
-    key: 'getTriTick',
-    value: function getTriTick(phase) {
-      var val = 2 * ((this.phase + phase) * (1.0 / _constant.TWOPI)) - 1.0;
-      /* istanbul ignore next */
-      if (val < 0.0) {
-        val = -val;
-      }
-      val = 2.0 * (val - 0.5);
-      return val;
-    }
-  }, {
-    key: 'getPhaseIncrement',
-    value: function getPhaseIncrement() {
-      var freq = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-
-      return _constant.TWOPI * (this.freq + freq) / _constant.SAMPLERATE;
-    }
-  }, {
-    key: 'wrap',
-    value: function wrap() {
-      /* istanbul ignore next */
-      if (this.phase > _constant.TWOPI) {
-        this.reset();
-      }
-    }
-  }]);
-
-  return Oscillator;
-}(_core2.default);
-
-exports.default = Oscillator;
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -17470,10 +17219,328 @@ exports.default = Oscillator;
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5), __webpack_require__(6)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(7)(module)))
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var ERRORS = {
+  invalidFreq: 'Frequency cannot be 0 or a negative number',
+  invalidGain: 'Gain cannot be less than 0'
+};
+
+exports.default = ERRORS;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _constant = __webpack_require__(0);
+
+var _oscillator = __webpack_require__(5);
+
+var _oscillator2 = _interopRequireDefault(_oscillator);
+
+var _impulse = __webpack_require__(8);
+
+var _impulse2 = _interopRequireDefault(_impulse);
+
+var _channel = __webpack_require__(9);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+module.exports = {
+  CONTEXT: _constant.CONTEXT,
+  Oscillator: _oscillator2.default,
+  Impulse: _impulse2.default,
+  Channel: _channel.Channel
+};
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _lodash = __webpack_require__(2);
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _core = __webpack_require__(1);
+
+var _core2 = _interopRequireDefault(_core);
+
+var _errors = __webpack_require__(3);
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _constant = __webpack_require__(0);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * Oscillator
+ * @param {Object={}} props Parameter object for Oscillator class
+ * @param {number=0} type Index of waveform
+ * @param {freq=440} freq Frequency in Hertz
+ * @param {gain=0} gain Level of output
+ * @param {phase=0} phase Phase in radian
+ * @param {offset=0} offset Offset to frequency in Hertz
+ */
+var Oscillator = function (_Core) {
+  _inherits(Oscillator, _Core);
+
+  function Oscillator() {
+    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Oscillator);
+
+    var _this = _possibleConstructorReturn(this, (Oscillator.__proto__ || Object.getPrototypeOf(Oscillator)).call(this, props));
+
+    _this.setType(props.type);
+    _this.setFreq(props.freq);
+    _this.setGain(props.gain);
+    _this.setPhase(props.phase);
+    _this.offset = props.offset || 0;
+    _this.sync = props.sync;
+    _this.mod = props.mod;
+    _this.retrig = props.retrig;
+
+    /* istanbul ignore next */
+    if (_constant.CONTEXT) {
+      _this.processor = _constant.CONTEXT.createScriptProcessor(1024);
+      _this.processor.onaudioprocess = _this.process.bind(_this);
+
+      _this.input = _constant.CONTEXT.createChannelMerger(10);
+
+      if (_this.retrig && _this.retrig.processor) {
+        _this.retrig.processor.connect(_this.input);
+      }
+
+      if (_this.mod && _this.mod.output) {
+        _this.mod.processor.connect(_this.input);
+      } else {
+        _constant.CONTEXT.createChannelMerger(1).connect(_this.input);
+      }
+
+      _this.input.connect(_this.processor);
+      _this.output = _constant.CONTEXT.createGain();
+      _this.output.gain.value = _this.gain;
+
+      _this.processor.connect(_this.output);
+    }
+    return _this;
+  }
+
+  _createClass(Oscillator, [{
+    key: 'update',
+    value: function update() {
+      this.processor.onaudioprocess = this.process.bind(this);
+    }
+  }, {
+    key: 'setType',
+    value: function setType(type) {
+      this.type = type || 0;
+      switch (this.type) {
+        case 0:
+          this.initialPhase = 0;
+          this.callback = this.getSineTick;
+          break;
+        case 1:
+          this.initialPhase = 0;
+          this.callback = this.getTriTick;
+          break;
+        case 2:
+          this.initialPhase = 0;
+          this.callback = this.getSawtoothDTick;
+          break;
+        case 3:
+          this.initialPhase = 0;
+          this.callback = this.getSawtoothUTick;
+          break;
+        case 4:
+        default:
+          this.initialPhase = 0;
+          this.callback = this.getSquareTick;
+          break;
+      }
+    }
+  }, {
+    key: 'setFreq',
+    value: function setFreq(freq) {
+      if (freq <= 0) {
+        this.freq = 440;
+        throw new Error(_errors2.default.invalidFreq);
+      } else {
+        this.freq = freq || 440;
+        console.log(this.freq);
+      }
+    }
+  }, {
+    key: 'setGain',
+    value: function setGain(gain) {
+      if (gain < 0) {
+        this.gain = 0;
+        throw new Error(_errors2.default.invalidGain);
+      } else {
+        this.gain = gain || 0;
+      }
+    }
+  }, {
+    key: 'setPhase',
+    value: function setPhase(phase) {
+      this.phase = phase || 0;
+    }
+
+    /**
+     * reset - reset phase
+     */
+
+  }, {
+    key: 'reset',
+    value: function reset() {
+      this.phase = this.initialPhase;
+      // this.freq = this.props.freq
+    }
+
+    /* istanbul ignore next */
+
+  }, {
+    key: 'process',
+    value: function process(event) {
+      var inputArray1 = event.inputBuffer.getChannelData(0);
+      var inputArray2 = event.inputBuffer.getChannelData(1);
+      var outputArray = event.outputBuffer.getChannelData(0);
+      var bufferSize = outputArray.length;
+
+      for (this.i = 0; this.i < bufferSize; this.i++) {
+        outputArray[this.i] = this.callback(0);
+
+        if (inputArray1[this.i] > 0) {
+          this.phase = this.initialPhase;
+        }
+
+        this.phase += this.getPhaseIncrement((this.mod ? inputArray1[this.i] * this.mod.gain + this.freq : 0) + this.offset);
+
+        // if (this.synced) {
+        //
+        //   if (this.synced.phase == 0) {
+        //     // console.log(this.type, 'rest')
+        //     this.reset()
+        //   }
+        // }
+        //
+        // if (this.callback(0) == 1) {
+        //   if (this.sync) {
+        //     this.sync.reset()
+        //   }
+        // }
+        //
+        //
+
+        if (this.phase >= _constant.TWOPI) {
+          this.reset();
+        }
+      }
+    }
+  }, {
+    key: 'getSineTick',
+    value: function getSineTick(phase) {
+      return Math.sin(this.phase + phase);
+    }
+  }, {
+    key: 'getSquareTick',
+    value: function getSquareTick(phase) {
+      if (this.phase + phase <= _constant.PI) {
+        return 1;
+      }
+      return -1;
+    }
+  }, {
+    key: 'getSawtoothUTick',
+    value: function getSawtoothUTick(phase) {
+      // let val = ((this.phase + phase) * (1.0 / TWOPI))
+
+      // if ((this.phase + phase) <= PI) {
+      //   return -val
+      // } else {
+      //   return 1 - val
+      // } 
+
+      var val = 2 * ((this.phase + phase) * (1.0 / _constant.TWOPI)) - 1.0;
+
+      if (val <= _constant.PI) {
+        val = 1 - val;
+      }
+
+      return val;
+    }
+  }, {
+    key: 'getSawtoothDTick',
+    value: function getSawtoothDTick(phase) {
+      var val = (this.phase + phase) * (1.0 / _constant.TWOPI);
+      // 1.0 - 2 * ((this.phase + phase) * (1.0 / TWOPI))
+
+      return 1.0 - 2 * ((this.phase + phase) * (1.0 / _constant.TWOPI));
+    }
+  }, {
+    key: 'getTriTick',
+    value: function getTriTick(phase) {
+      var val = 2 * ((this.phase + phase) * (1.0 / _constant.TWOPI)) - 1.0;
+      /* istanbul ignore next */
+      if (val < 0.0) {
+        val = -val;
+      }
+      val = 2.0 * (val - 0.5);
+      return val;
+    }
+  }, {
+    key: 'getPhaseIncrement',
+    value: function getPhaseIncrement() {
+      var freq = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+      return _constant.TWOPI * (this.freq + freq) / _constant.SAMPLERATE;
+    }
+  }, {
+    key: 'wrap',
+    value: function wrap() {
+      /* istanbul ignore next */
+      if (this.phase > 1) {
+        this.reset();
+      }
+    }
+  }]);
+
+  return Oscillator;
+}(_core2.default);
+
+exports.default = Oscillator;
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports) {
 
 var g;
@@ -17500,7 +17567,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -17528,7 +17595,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17537,15 +17604,198 @@ module.exports = function(module) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var ERRORS = {
-  invalidFreq: 'Frequency cannot be 0 or a negative number',
-  invalidGain: 'Gain cannot be less than 0'
-};
 
-exports.default = ERRORS;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _lodash = __webpack_require__(2);
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _core = __webpack_require__(1);
+
+var _core2 = _interopRequireDefault(_core);
+
+var _errors = __webpack_require__(3);
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _constant = __webpack_require__(0);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * Impulse
+ * @param {Object={}} props Parameter object for Oscillator class
+ * @param {number=0} type Index of waveform
+ * @param {freq=440} freq Frequency in Hertz
+ * @param {gain=0} gain Level of output
+ * @param {phase=0} phase Phase in radian
+ * @param {offset=0} offset Offset to frequency in Hertz
+ */
+var Impulse = function (_Core) {
+  _inherits(Impulse, _Core);
+
+  function Impulse() {
+    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Impulse);
+
+    var _this = _possibleConstructorReturn(this, (Impulse.__proto__ || Object.getPrototypeOf(Impulse)).call(this, props));
+
+    _this.setType(props.type);
+    _this.setFreq(props.freq);
+    _this.setGain(props.gain);
+    _this.setPhase(props.phase);
+    _this.offset = props.offset || 0;
+    _this.sync = props.sync;
+    _this.mod = props.mod;
+
+    /* istanbul ignore next */
+    if (_constant.CONTEXT) {
+      _this.processor = _constant.CONTEXT.createScriptProcessor(1024);
+      _this.processor.onaudioprocess = _this.process.bind(_this);
+
+      _this.input = _constant.CONTEXT.createChannelMerger(10);
+
+      var mod = void 0,
+          sync = void 0;
+
+      if (_this.mod && _this.mod.output) {
+        _this.mod.processor.connect(_this.input);
+      } else {
+        _constant.CONTEXT.createChannelMerger(1).connect(_this.input);
+      }
+
+      _this.input.connect(_this.processor);
+      _this.output = _constant.CONTEXT.createGain();
+      _this.output.gain.value = _this.gain;
+
+      _this.processor.connect(_this.output);
+    }
+    return _this;
+  }
+
+  _createClass(Impulse, [{
+    key: 'update',
+    value: function update() {
+      this.processor.onaudioprocess = this.process.bind(this);
+    }
+  }, {
+    key: 'setType',
+    value: function setType(type) {
+      this.type = type || 0;
+      switch (this.type) {
+        case 0:
+          this.callback = this.getSineTick;
+          break;
+        case 1:
+          this.callback = this.getTriTick;
+          break;
+        case 2:
+          this.callback = this.getSawtoothDTick;
+          break;
+        case 3:
+          this.callback = this.getSawtoothUTick;
+          break;
+        case 4:
+        default:
+          this.callback = this.getSquareTick;
+          break;
+      }
+    }
+  }, {
+    key: 'setFreq',
+    value: function setFreq(freq) {
+      if (freq <= 0) {
+        this.freq = 440;
+        throw new Error(_errors2.default.invalidFreq);
+      } else {
+        this.freq = freq || 440;
+        console.log(this.freq);
+      }
+    }
+  }, {
+    key: 'setGain',
+    value: function setGain(gain) {
+      if (gain < 0) {
+        this.gain = 0;
+        throw new Error(_errors2.default.invalidGain);
+      } else {
+        this.gain = gain || 0;
+      }
+    }
+  }, {
+    key: 'setPhase',
+    value: function setPhase(phase) {
+      this.phase = phase || 0;
+    }
+
+    /**
+     * reset - reset phase
+     */
+
+  }, {
+    key: 'reset',
+    value: function reset() {
+
+      this.phase = 0;
+      // this.freq = this.props.freq
+    }
+
+    /* istanbul ignore next */
+
+  }, {
+    key: 'process',
+    value: function process(event) {
+      var inputArray1 = event.inputBuffer.getChannelData(0);
+      var inputArray2 = event.inputBuffer.getChannelData(1);
+      var outputArray = event.outputBuffer.getChannelData(0);
+      var bufferSize = outputArray.length;
+
+      for (this.i = 0; this.i < bufferSize; this.i++) {
+
+        if (this.phase == 0) {
+          outputArray[this.i] = 1;
+        } else {
+          outputArray[this.i] = 0;
+        }
+        this.phase += this.getPhaseIncrement((this.mod ? inputArray1[this.i] * this.mod.gain + this.freq : 0) + this.offset);
+
+        if (this.phase >= _constant.TWOPI) {
+          this.reset();
+        }
+      }
+    }
+  }, {
+    key: 'getPhaseIncrement',
+    value: function getPhaseIncrement() {
+      var freq = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+      return _constant.TWOPI * (this.freq + freq) / _constant.SAMPLERATE;
+    }
+  }, {
+    key: 'wrap',
+    value: function wrap() {
+      /* istanbul ignore next */
+      if (this.phase > 1) {
+        this.reset();
+      }
+    }
+  }]);
+
+  return Impulse;
+}(_core2.default);
+
+exports.default = Impulse;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17556,7 +17806,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Channel = undefined;
 
-var _channel = __webpack_require__(9);
+var _channel = __webpack_require__(10);
 
 var _channel2 = _interopRequireDefault(_channel);
 
@@ -17565,7 +17815,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.Channel = _channel2.default;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
